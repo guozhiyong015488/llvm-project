@@ -51,40 +51,40 @@ simple:
 // CHECK-NEXT: End of Function "simple"
 // CHECK-EMPTY:
 // CHECK-NEXT: Running register safety analysis...
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #25, pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   stp     x29, x30, [sp, #-0x10]!, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   b       [[BB1]], pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #25, pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: LR W30 W30_HI , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   stp     x29, x30, [sp, #-0x10]!, pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   b       [[BB1]], pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
 // CHECK-NEXT:  DataflowRegisterSafetyAnalysis::Confluence(
 // CHECK-NEXT:    State 1: pacret-state<empty>
-// CHECK-NEXT:    State 2: pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:    merged state: pacret-state<SafeToDerefRegs: , Insts: >
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   autiza  x0, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W0 X0 W0_HI , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   blr     x0, pacret-state<SafeToDerefRegs: W0 X0 W0_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ldp     x29, x30, [sp], #0x10, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #29, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
+// CHECK-NEXT:    State 2: pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
+// CHECK-NEXT:    merged state: pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   autiza  x0, pacret-state<SafeToDerefRegs: , TrustedRegs:  , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W0 X0 W0_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   blr     x0, pacret-state<SafeToDerefRegs: W0 X0 W0_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ldp     x29, x30, [sp], #0x10, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #29, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
 // CHECK-NEXT:  DataflowRegisterSafetyAnalysis::Confluence(
-// CHECK-NEXT:    State 1: pacret-state<SafeToDerefRegs: , Insts: >
-// CHECK-NEXT:    State 2: pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:    merged state: pacret-state<SafeToDerefRegs: , Insts: >
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   autiza  x0, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W0 X0 W0_HI , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   blr     x0, pacret-state<SafeToDerefRegs: W0 X0 W0_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ldp     x29, x30, [sp], #0x10, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #29, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
+// CHECK-NEXT:    State 1: pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >
+// CHECK-NEXT:    State 2: pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:    merged state: pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   autiza  x0, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W0 X0 W0_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   blr     x0, pacret-state<SafeToDerefRegs: W0 X0 W0_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ldp     x29, x30, [sp], #0x10, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   hint    #29, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: , Insts: >)
 // CHECK-NEXT: After register safety analysis:
 // CHECK-NEXT: Binary Function "simple"  {
 // CHECK-NEXT:   Number      : 1
@@ -94,27 +94,30 @@ simple:
 // CHECK-NEXT: }
 // CHECK-NEXT: [[BB0]] (3 instructions, align : 1)
 // CHECK-NEXT:   Entry Point
-// CHECK-NEXT:     00000000:   paciasp # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000004:   stp     x29, x30, [sp, #-0x10]! # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000008:   b       [[BB1]] # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000000:   paciasp # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000004:   stp     x29, x30, [sp, #-0x10]! # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000008:   b       [[BB1]] # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT:   Successors: [[BB1]]
 // CHECK-EMPTY:
 // CHECK-NEXT: [[BB1]] (5 instructions, align : 1)
 // CHECK-NEXT:   Predecessors: [[BB0]]
-// CHECK-NEXT:     0000000c:   autiza  x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000010:   blr     x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000014:   ldp     x29, x30, [sp], #0x10 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000018:   autiasp # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     0000001c:   ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:     0000000c:   autiza  x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000010:   blr     x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000014:   ldp     x29, x30, [sp], #0x10 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000018:   autiasp # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     0000001c:   ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-EMPTY:
 // CHECK-NEXT: DWARF CFI Instructions:
 // CHECK-NEXT:     <empty>
 // CHECK-NEXT: End of Function "simple"
 // CHECK-EMPTY:
-// PAUTH-NEXT:   Found call inst:     00000000:        blr     x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// PAUTH-NEXT:   Found sign inst:     00000000:        paciasp # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// PAUTH-NEXT:     Signed reg: LR
+// PAUTH-NEXT:     TrustedRegs: LR W30 W30_HI
+// PAUTH-NEXT:   Found call inst:     00000000:        blr     x0 # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // PAUTH-NEXT:     Call destination reg: X0
 // PAUTH-NEXT:     SafeToDerefRegs: W0 X0 W0_HI{{[ \t]*$}}
-// CHECK-NEXT:   Found RET inst:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:   Found RET inst:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT:     RetReg: LR
 // CHECK-NEXT:     Authenticated reg: (none)
 // CHECK-NEXT:     SafeToDerefRegs: LR W30 W30_HI{{[ \t]*$}}
@@ -129,10 +132,10 @@ clobber:
 // CHECK-LABEL:Analyzing in function clobber, AllocatorId 1
 // ...
 // CHECK:      Running register safety analysis...
-// CHECK-NEXT: RegisterSafetyAnalysis::ComputeNext(   mov     w30, #0x0, pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:  .. result: (pacret-state<SafeToDerefRegs: W30_HI , Insts: >)
-// CHECK-NEXT: RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: W30_HI , Insts: >)
-// CHECK-NEXT:  .. result: (pacret-state<SafeToDerefRegs: W30_HI , Insts: >)
+// CHECK-NEXT: RegisterSafetyAnalysis::ComputeNext(   mov     w30, #0x0, pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: LR W30 W30_HI , Insts: >)
+// CHECK-NEXT:  .. result: (pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: >)
+// CHECK-NEXT: RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: >)
+// CHECK-NEXT:  .. result: (pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: >)
 // CHECK-NEXT: After register safety analysis:
 // CHECK-NEXT: Binary Function "clobber"  {
 // ...
@@ -141,16 +144,16 @@ clobber:
 // The above output was printed after first run of analysis
 
 // CHECK-EMPTY:
-// CHECK-NEXT:   Found RET inst:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:   Found RET inst:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT:     RetReg: LR
 // CHECK-NEXT:     Authenticated reg: (none)
 // CHECK-NEXT:     SafeToDerefRegs: W30_HI{{[ \t]*$}}
 // CHECK-EMPTY:
 // CHECK-NEXT: Running detailed register safety analysis...
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   mov     w30, #0x0, pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: [0]()>)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   mov     w30, #0x0, pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: LR W30 W30_HI , Insts: [0]()>)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   ret     x30, pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: W30_HI , TrustedRegs: W30_HI , Insts: [0](0x{{[0-9a-f]+}} )>)
 // CHECK-NEXT: After detailed register safety analysis:
 // CHECK-NEXT: Binary Function "clobber"  {
 // ...
@@ -160,7 +163,7 @@ clobber:
 // Iterating over the reports and attaching clobbering info:
 
 // CHECK-EMPTY:
-// CHECK-NEXT:   Attaching clobbering info to:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: [0](0x{{[0-9a-f]+}} )>
+// CHECK-NEXT:   Attaching clobbering info to:     00000000:         ret # DataflowRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: [0](0x{{[0-9a-f]+}} )>
 
         .globl  nocfg
         .type   nocfg,@function
@@ -193,13 +196,13 @@ nocfg:
 // CHECK-NEXT: End of Function "nocfg"
 // CHECK-EMPTY:
 // CHECK-NEXT: Running register safety analysis...
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]], pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  br      x0, pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]], pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: LR W30 W30_HI , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  br      x0, pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: >)
 // CHECK-NEXT:  Due to label, resetting the state before:     00000000:       ret # Offset: 8
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  ret     x30, pacret-state<SafeToDerefRegs: , Insts: >)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: >)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  ret     x30, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: >)
 // CHECK-NEXT: After register safety analysis:
 // CHECK-NEXT: Binary Function "nocfg"  {
 // CHECK-NEXT:   Number      : 3
@@ -208,31 +211,31 @@ nocfg:
 // CHECK:        Secondary Entry Points : __ENTRY_nocfg@0x[[ENTRY_ADDR]]
 // CHECK-NEXT: }
 // CHECK-NEXT: .{{[A-Za-z0-9]+}}:
-// CHECK-NEXT:     00000000:   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]] # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
-// CHECK-NEXT:     00000004:   br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000000:   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]] # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000004:   br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT: __ENTRY_nocfg@0x[[ENTRY_ADDR]] (Entry Point):
 // CHECK-NEXT: .{{[A-Za-z0-9]+}}:
-// CHECK-NEXT:     00000008:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:     00000008:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT: DWARF CFI Instructions:
 // CHECK-NEXT:     <empty>
 // CHECK-NEXT: End of Function "nocfg"
 // CHECK-EMPTY:
-// PAUTH-NEXT:   Found call inst:     00000000:        br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// PAUTH-NEXT:   Found call inst:     00000000:        br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // PAUTH-NEXT:     Call destination reg: X0
 // PAUTH-NEXT:     SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI
-// CHECK-NEXT:   Found RET inst:     00000000:         ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: >
+// CHECK-NEXT:   Found RET inst:     00000000:         ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: >
 // CHECK-NEXT:     RetReg: LR
 // CHECK-NEXT:     Authenticated reg: (none)
 // CHECK-NEXT:     SafeToDerefRegs:
 // CHECK-EMPTY:
 // CHECK-NEXT: Running detailed register safety analysis...
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]], pacret-state<SafeToDerefRegs: LR W30 W30_HI , Insts: [0]()>)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  br      x0, pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]], pacret-state<SafeToDerefRegs: LR W30 W30_HI , TrustedRegs: LR W30 W30_HI , Insts: [0]()>)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  br      x0, pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: LR W0 W30 X0 W0_HI W30_HI , TrustedRegs: LR W0 W30 X0 W0_HI W30_HI , Insts: [0]()>)
 // CHECK-NEXT:  Due to label, resetting the state before:     00000000:       ret # Offset: 8
-// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  ret     x30, pacret-state<SafeToDerefRegs: , Insts: [0]()>)
-// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , Insts: [0]()>)
+// CHECK-NEXT:  RegisterSafetyAnalysis::ComputeNext(  ret     x30, pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: [0]()>)
+// CHECK-NEXT:   .. result: (pacret-state<SafeToDerefRegs: , TrustedRegs: , Insts: [0]()>)
 // CHECK-NEXT: After detailed register safety analysis:
 // CHECK-NEXT: Binary Function "nocfg"  {
 // CHECK-NEXT:   Number      : 3
@@ -240,16 +243,16 @@ nocfg:
 // CHECK:        Secondary Entry Points : __ENTRY_nocfg@0x[[ENTRY_ADDR]]
 // CHECK-NEXT: }
 // CHECK-NEXT: .{{[A-Za-z0-9]+}}:
-// CHECK-NEXT:     00000000:   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]] # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: [0]()>
-// CHECK-NEXT:     00000004:   br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: [0]()>
+// CHECK-NEXT:     00000000:   adr     x0, __ENTRY_nocfg@0x[[ENTRY_ADDR]] # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: [0]()>
+// CHECK-NEXT:     00000004:   br      x0 # UNKNOWN CONTROL FLOW # Offset: 4 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: [0]()>
 // CHECK-NEXT: __ENTRY_nocfg@0x[[ENTRY_ADDR]] (Entry Point):
 // CHECK-NEXT: .{{[A-Za-z0-9]+}}:
-// CHECK-NEXT:     00000008:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: [0]()>
+// CHECK-NEXT:     00000008:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: [0]()>
 // CHECK-NEXT: DWARF CFI Instructions:
 // CHECK-NEXT:     <empty>
 // CHECK-NEXT: End of Function "nocfg"
 // CHECK-EMPTY:
-// CHECK-NEXT:   Attaching clobbering info to:     00000000:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, Insts: [0]()>
+// CHECK-NEXT:   Attaching clobbering info to:     00000000:   ret # Offset: 8 # CFGUnawareRegisterSafetyAnalysis: pacret-state<SafeToDerefRegs: BitVector, TrustedRegs: BitVector, Insts: [0]()>
 
 // CHECK-LABEL:Analyzing in function main, AllocatorId 1
         .globl  main
