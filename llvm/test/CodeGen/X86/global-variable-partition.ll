@@ -96,20 +96,20 @@ target triple = "x86_64-unknown-linux-gnu"
 ; and prune the unlikely list.
 ; For @bss2
 ; COMMON:      .type bss2,@object
-; SYM-NEXT:    .section	.bss.unlikely.bss2,"aw",@nobits
-; UNIQ-NEXT:   .section	.bss.unlikely.,"aw",@nobits,unique,9
-; AGG-NEXT:    .section	.bss.unlikely.,"aw",@nobits
+; SYM-NEXT:    .section	.bss.hot.bss2,"aw",@nobits
+; UNIQ-NEXT:   .section	.bss.hot.,"aw",@nobits,unique,9
+; AGG-NEXT:    .section	.bss.hot.,"aw",@nobits
 
 ; For @data3
 ; COMMON:      .type data3,@object
-; SYM-NEXT:    .section	.data.unlikely.data3,"aw",@progbits
-; UNIQ-NEXT:   .section	.data.unlikely.,"aw",@progbits,unique,10
-; AGG-NEXT:    .section	.data.unlikely.,"aw",@progbits
+; SYM-NEXT:    .section	.data.hot.data3,"aw",@progbits
+; UNIQ-NEXT:   .section	.data.hot.,"aw",@progbits,unique,10
+; AGG-NEXT:    .section	.data.hot.,"aw",@progbits
 
 ; For @data_with_unknown_hotness
 ; SYM: 	       .type	.Ldata_with_unknown_hotness,@object          # @data_with_unknown_hotness
-; SYM:         .section .data..Ldata_with_unknown_hotness,"aw",@progbits
-; UNIQ:        .section  .data,"aw",@progbits,unique,11
+; SYM:         .section .data...Ldata_with_unknown_hotness,"aw",@progbits
+; UNIQ:        .section  .data..,"aw",@progbits,unique,11
 ; The `.section` directive is omitted for .data with -unique-section-names=false.
 ; See MCSectionELF::shouldOmitSectionDirective for the implementation details.
 ; AGG:         .data
