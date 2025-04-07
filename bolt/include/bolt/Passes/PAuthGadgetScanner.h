@@ -199,7 +199,7 @@ raw_ostream &operator<<(raw_ostream &OS, const MCInstReference &);
 
 namespace PAuthGadgetScanner {
 
-class PacRetAnalysis;
+class RegisterSafetyAnalysis;
 struct State;
 
 /// Description of a gadget kind that can be detected. Intended to be

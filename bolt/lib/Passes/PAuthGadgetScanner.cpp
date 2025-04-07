@@ -124,27 +124,6 @@ public:
   }
 };
 
-// Without CFG, we reset gadget scanning state when encountering an
-// unconditional branch. Note that BC.MIB->isUnconditionalBranch neither
-// considers indirect branches nor annotated tail calls as unconditional.
-static bool isStateTrackingBoundary(const BinaryContext &BC,
-                                    const MCInst &Inst) {
-  const MCInstrDesc &Desc = BC.MII->get(Inst.getOpcode());
-  // Adapted from llvm::MCInstrDesc::isUnconditionalBranch().
-  return Desc.isBranch() && Desc.isBarrier();
-}
-
-template <typename T> static void iterateOverInstrs(BinaryFunction &BF, T Fn) {
-  if (BF.hasCFG()) {
-    for (BinaryBasicBlock &BB : BF)
-      for (int64_t I = 0, E = BB.size(); I < E; ++I)
-        Fn(MCInstInBBReference(&BB, I));
-  } else {
-    for (auto I : BF.instrs())
-      Fn(MCInstInBFReference(&BF, I.first));
-  }
-}
-
 // The security property that is checked is:
 // When a register is used as the address to jump to in a return instruction,
 // that register must be safe-to-dereference. It must either
@@ -286,16 +265,21 @@ void PacStatePrinter::print(raw_ostream &OS, const State &S) const {
   OS << ">";
 }
 
-class PacRetAnalysis {
+/// Computes which registers are safe to be used by control flow instructions.
+///
+/// This is the base class for two implementations: a dataflow-based analysis
+/// which is intended to be used for most functions and a simplified CFG-unaware
+/// version for functions without reconstructed CFG.
+class RegisterSafetyAnalysis {
 public:
-  PacRetAnalysis(BinaryFunction &BF,
-                 const std::vector<MCPhysReg> &RegsToTrackInstsFor)
+  RegisterSafetyAnalysis(BinaryFunction &BF,
+                         const std::vector<MCPhysReg> &RegsToTrackInstsFor)
       : BC(BF.getBinaryContext()), NumRegs(BC.MRI->getNumRegs()),
         RegsToTrackInstsFor(RegsToTrackInstsFor) {}
 
-  virtual ~PacRetAnalysis() {}
+  virtual ~RegisterSafetyAnalysis() {}
 
-  static std::shared_ptr<PacRetAnalysis>
+  static std::shared_ptr<RegisterSafetyAnalysis>
   create(BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
          const std::vector<MCPhysReg> &RegsToTrackInstsFor);
 
@@ -373,7 +357,7 @@ protected:
   State computeNext(const MCInst &Point, const State &Cur) {
     PacStatePrinter P(BC);
     LLVM_DEBUG({
-      dbgs() << " PacRetAnalysis::ComputeNext(";
+      dbgs() << "  RegisterSafetyAnalysis::ComputeNext(";
       BC.InstPrinter->printInst(&const_cast<MCInst &>(Point), 0, "", *BC.STI,
                                 dbgs());
       dbgs() << ", ";
@@ -422,7 +406,7 @@ protected:
     }
 
     LLVM_DEBUG({
-      dbgs() << "  .. result: (";
+      dbgs() << "    .. result: (";
       P.print(dbgs(), Next);
       dbgs() << ")\n";
     });
@@ -456,21 +440,23 @@ public:
   }
 };
 
-class PacRetDFAnalysis
-    : public PacRetAnalysis,
-      public DataflowAnalysis<PacRetDFAnalysis, State, /*Backward=*/false,
-                              PacStatePrinter> {
-  using DFParent =
-      DataflowAnalysis<PacRetDFAnalysis, State, false, PacStatePrinter>;
+class DataflowRegisterSafetyAnalysis
+    : public RegisterSafetyAnalysis,
+      public DataflowAnalysis<DataflowRegisterSafetyAnalysis, State,
+                              /*Backward=*/false, PacStatePrinter> {
+  using DFParent = DataflowAnalysis<DataflowRegisterSafetyAnalysis, State,
+                                    false, PacStatePrinter>;
   friend DFParent;
 
-  using PacRetAnalysis::BC;
-  using PacRetAnalysis::computeNext;
+  using RegisterSafetyAnalysis::BC;
+  using RegisterSafetyAnalysis::computeNext;
 
 public:
-  PacRetDFAnalysis(BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
-                   const std::vector<MCPhysReg> &RegsToTrackInstsFor)
-      : PacRetAnalysis(BF, RegsToTrackInstsFor), DFParent(BF, AllocId) {}
+  DataflowRegisterSafetyAnalysis(
+      BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
+      const std::vector<MCPhysReg> &RegsToTrackInstsFor)
+      : RegisterSafetyAnalysis(BF, RegsToTrackInstsFor), DFParent(BF, AllocId) {
+  }
 
   ErrorOr<const State &> getStateBefore(const MCInst &Inst) const override {
     return DFParent::getStateBefore(Inst);
@@ -493,11 +479,11 @@ protected:
   void doConfluence(State &StateOut, const State &StateIn) {
     PacStatePrinter P(BC);
     LLVM_DEBUG({
-      dbgs() << " PacRetAnalysis::Confluence(\n";
-      dbgs() << "   State 1: ";
+      dbgs() << "  DataflowRegisterSafetyAnalysis::Confluence(\n";
+      dbgs() << "    State 1: ";
       P.print(dbgs(), StateOut);
       dbgs() << "\n";
-      dbgs() << "   State 2: ";
+      dbgs() << "    State 2: ";
       P.print(dbgs(), StateIn);
       dbgs() << ")\n";
     });
@@ -505,16 +491,52 @@ protected:
     StateOut.merge(StateIn);
 
     LLVM_DEBUG({
-      dbgs() << "   merged state: ";
+      dbgs() << "    merged state: ";
       P.print(dbgs(), StateOut);
       dbgs() << "\n";
     });
   }
 
-  StringRef getAnnotationName() const { return "PacRetAnalysis"; }
+  StringRef getAnnotationName() const {
+    return "DataflowRegisterSafetyAnalysis";
+  }
 };
 
-class NoCFGPacRetAnalysis : public PacRetAnalysis {
+// A simplified implementation of DataflowRegisterSafetyAnalysis for functions
+// lacking CFG information.
+//
+// Let assume the instructions can only be executed linearly unless there is
+// a label to jump to - this should handle both directly jumping to a location
+// encoded as an immediate operand of a branch instruction, as well as saving a
+// branch destination somewhere and passing it to an indirect branch instruction
+// later, provided no arithmetic is performed on the destination address:
+//
+//     ; good: the destination is directly encoded into the branch instruction
+//     cbz x0, some_label
+//
+//     ; good: the branch destination is first stored and then used as-is
+//     adr x1, some_label
+//     br  x1
+//
+//     ; bad: some clever arithmetic is performed manually
+//     adr x1, some_label
+//     add x1, x1, #4
+//     br  x1
+//     ...
+//   some_label:
+//     ; pessimistically reset the state as we are unsure where we came from
+//     ...
+//     ret
+//   JTI0:
+//     .byte some_label - Ltmp0 ; computing offsets using labels may probably
+//                                work too, provided enough information is
+//                                retained by the assembler and linker
+//
+// Then, a function can be split into a number of disjoint contiguous sequences
+// of instructions without labels in between. These sequences can be processed
+// the same way basic blocks are processed by data-flow analysis, assuming
+// pessimistically that all registers are unsafe at the start of each sequence.
+class CFGUnawareRegisterSafetyAnalysis : public RegisterSafetyAnalysis {
   BinaryFunction &BF;
   MCPlusBuilder::AllocatorIdTy AllocId;
   unsigned StateAnnotationIndex;
@@ -531,11 +553,13 @@ class NoCFGPacRetAnalysis : public PacRetAnalysis {
   }
 
 public:
-  NoCFGPacRetAnalysis(BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
-                      const std::vector<MCPhysReg> &RegsToTrackInstsFor)
-      : PacRetAnalysis(BF, RegsToTrackInstsFor), BF(BF), AllocId(AllocId) {
+  CFGUnawareRegisterSafetyAnalysis(
+      BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
+      const std::vector<MCPhysReg> &RegsToTrackInstsFor)
+      : RegisterSafetyAnalysis(BF, RegsToTrackInstsFor), BF(BF),
+        AllocId(AllocId) {
     StateAnnotationIndex =
-        BC.MIB->getOrCreateAnnotationIndex("NoCFGPacRetAnalysis");
+        BC.MIB->getOrCreateAnnotationIndex("CFGUnawareRegisterSafetyAnalysis");
   }
 
   void run() override {
@@ -547,23 +571,22 @@ public:
       // can be jumped-to, thus conservatively resetting S. As an exception,
       // let's ignore any labels at the beginning of the function, as at least
       // one label is expected there.
-      if (BF.hasLabelAt(I.first) && &Inst != &BF.instrs().begin()->second)
+      if (BF.hasLabelAt(I.first) && &Inst != &BF.instrs().begin()->second) {
+        LLVM_DEBUG({
+          traceInst(BC, "Due to label, resetting the state before", Inst);
+        });
         S = createUnsafeState();
+      }
 
       // Check if we need to remove an old annotation (this is the case if
       // this is the second, detailed, run of the analysis).
       if (BC.MIB->hasAnnotation(Inst, StateAnnotationIndex))
         BC.MIB->removeAnnotation(Inst, StateAnnotationIndex);
-      // Attach the state *before* this instruction.
+      // Attach the state *before* this instruction executes.
       BC.MIB->addAnnotation(Inst, StateAnnotationIndex, S, AllocId);
 
       // Compute the state after this instruction.
-      // If this instruction is an unconditional branch (incl. indirect ones),
-      // reset the state.
-      if (isStateTrackingBoundary(BC, Inst))
-        S = createUnsafeState();
-      else
-        S = computeNext(Inst, S);
+      S = computeNext(Inst, S);
     }
   }
 
@@ -571,16 +594,17 @@ public:
     return BC.MIB->getAnnotationAs<State>(Inst, StateAnnotationIndex);
   }
 
-  ~NoCFGPacRetAnalysis() { cleanStateAnnotations(); }
+  ~CFGUnawareRegisterSafetyAnalysis() { cleanStateAnnotations(); }
 };
 
-std::shared_ptr<PacRetAnalysis>
-PacRetAnalysis::create(BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
-                       const std::vector<MCPhysReg> &RegsToTrackInstsFor) {
+std::shared_ptr<RegisterSafetyAnalysis> RegisterSafetyAnalysis::create(
+    BinaryFunction &BF, MCPlusBuilder::AllocatorIdTy AllocId,
+    const std::vector<MCPhysReg> &RegsToTrackInstsFor) {
   if (BF.hasCFG())
-    return std::make_shared<PacRetDFAnalysis>(BF, AllocId, RegsToTrackInstsFor);
-  return std::make_shared<NoCFGPacRetAnalysis>(BF, AllocId,
-                                               RegsToTrackInstsFor);
+    return std::make_shared<DataflowRegisterSafetyAnalysis>(
+        BF, AllocId, RegsToTrackInstsFor);
+  return std::make_shared<CFGUnawareRegisterSafetyAnalysis>(
+      BF, AllocId, RegsToTrackInstsFor);
 }
 
 static std::shared_ptr<Report>
@@ -634,21 +658,33 @@ shouldReportCallGadget(const BinaryContext &BC, const MCInstReference &Inst,
   return std::make_shared<GadgetReport>(CallKind, Inst, DestReg);
 }
 
+template <typename T> static void iterateOverInstrs(BinaryFunction &BF, T Fn) {
+  if (BF.hasCFG()) {
+    for (BinaryBasicBlock &BB : BF)
+      for (int64_t I = 0, E = BB.size(); I < E; ++I)
+        Fn(MCInstInBBReference(&BB, I));
+  } else {
+    for (auto I : BF.instrs())
+      Fn(MCInstInBFReference(&BF, I.first));
+  }
+}
+
 FunctionAnalysisResult
 Analysis::findGadgets(BinaryFunction &BF,
                       MCPlusBuilder::AllocatorIdTy AllocatorId) {
   FunctionAnalysisResult Result;
 
-  auto PRA = PacRetAnalysis::create(BF, AllocatorId, {});
-  PRA->run();
+  auto RSA = RegisterSafetyAnalysis::create(BF, AllocatorId, {});
+  LLVM_DEBUG({ dbgs() << "Running register safety analysis...\n"; });
+  RSA->run();
   LLVM_DEBUG({
-    dbgs() << " After PacRetAnalysis:\n";
+    dbgs() << "After register safety analysis:\n";
     BF.dump();
   });
 
   BinaryContext &BC = BF.getBinaryContext();
   iterateOverInstrs(BF, [&](MCInstReference Inst) {
-    const State &S = *PRA->getStateBefore(Inst);
+    const State &S = *RSA->getStateBefore(Inst);
 
     // If non-empty state was never propagated from the entry basic block
     // to Inst, assume it to be unreachable and report a warning.
@@ -682,10 +718,11 @@ void Analysis::computeDetailedInfo(BinaryFunction &BF,
   std::vector<MCPhysReg> RegsToTrackVec(RegsToTrack.begin(), RegsToTrack.end());
 
   // Re-compute the analysis with register tracking.
-  auto PRWIA = PacRetAnalysis::create(BF, AllocatorId, RegsToTrackVec);
-  PRWIA->run();
+  auto RSWIA = RegisterSafetyAnalysis::create(BF, AllocatorId, RegsToTrackVec);
+  LLVM_DEBUG({ dbgs() << "\nRunning detailed register safety analysis...\n"; });
+  RSWIA->run();
   LLVM_DEBUG({
-    dbgs() << " After detailed PacRetAnalysis:\n";
+    dbgs() << "After detailed register safety analysis:\n";
     BF.dump();
   });
 
@@ -694,7 +731,7 @@ void Analysis::computeDetailedInfo(BinaryFunction &BF,
     LLVM_DEBUG(
         { traceInst(BC, "Attaching clobbering info to", Report->Location); });
     (void)BC;
-    Report->setOverwritingInstrs(PRWIA->getLastClobberingInsts(
+    Report->setOverwritingInstrs(RSWIA->getLastClobberingInsts(
         Report->Location, BF, Report->getAffectedRegisters()));
   }
 }
